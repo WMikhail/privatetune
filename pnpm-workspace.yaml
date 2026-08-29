@@ -1,0 +1,13 @@
+packages:
+  - '.'
+
+allowBuilds:
+  vue-demi: true
+
+minimumReleaseAgeExclude:
+  - reka-ui@2.10.2
+
+overrides:
+  update-browserslist-db: 1.3.0
+
+verifyDepsBeforeRun: false
