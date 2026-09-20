@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { PitchSmoother } from '../pitch-smoother'
 import { amplitudeToDb, dbToAmplitude, passesSignalGate, prepareSignal } from '../signal-gate'
 import { matchPitch } from '../tuning-matcher'
+import { midiToFrequency } from '@/domain/note-math'
 
 describe('signal gate', () => {
   it('removes DC and calculates RMS', () => {
@@ -54,15 +55,29 @@ describe('smoothing and matching', () => {
     expect(Math.abs(matched.cents)).toBeLessThan(0.01)
   })
 
-  it('uses hysteresis before switching automatic strings', () => {
-    const matched = matchPitch(94, {
+  it('prefers a nearby fundamental over an ambiguous third harmonic in automatic mode', () => {
+    const frequency = midiToFrequency(64) * 2 ** (3 / 1200)
+    const matched = matchPitch(frequency, {
       mode: 'automatic',
       strings: [40, 45, 50, 55, 59, 64],
       guidedStringIndex: 0,
       a4: 440,
-      previousMidi: 40,
-      hysteresisCents: 35
+      previousMidi: null
     })
-    expect(matched.noteMidi).toBe(40)
+    expect(matched.noteMidi).toBe(64)
+    expect(matched.stringIndex).toBe(5)
+    expect(matched.cents).toBeCloseTo(3)
+  })
+
+  it('uses hysteresis before switching automatic strings', () => {
+    const options = {
+      mode: 'automatic',
+      strings: [40, 45, 50, 55, 59, 64],
+      guidedStringIndex: 0,
+      a4: 440,
+      hysteresisCents: 35
+    } as const
+    expect(matchPitch(96, { ...options, previousMidi: null }).noteMidi).toBe(45)
+    expect(matchPitch(96, { ...options, previousMidi: 40 }).noteMidi).toBe(40)
   })
 })

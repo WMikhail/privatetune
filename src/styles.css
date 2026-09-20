@@ -7,8 +7,8 @@
   --line: #2b3238;
   --line-bright: #434b52;
   --text: #f1f3ee;
-  --muted: #91999e;
-  --faint: #788187;
+  --muted: #a8b0b5;
+  --faint: #929ba1;
   --accent: #d5ff3f;
   --accent-soft: rgba(213, 255, 63, 0.14);
   --amber: #ffae3d;
@@ -201,14 +201,13 @@ select:disabled {
   color: var(--accent);
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.1em;
 }
 .panel-heading h1 {
   margin: 12px 0 0;
   font-size: clamp(24px, 2.5vw, 35px);
   line-height: 1.04;
-  letter-spacing: -0.045em;
-  text-transform: uppercase;
+  letter-spacing: -0.035em;
 }
 .panel-intro {
   max-width: 24ch;
@@ -345,7 +344,7 @@ select:disabled {
   color: var(--faint);
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.12em;
 }
 .gauge__note-wrap {
   display: flex;
@@ -386,19 +385,6 @@ select:disabled {
 }
 .meter {
   margin-top: clamp(40px, 7vh, 78px);
-}
-.meter__directions {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  color: var(--faint);
-  font-size: 10px;
-  font-weight: 750;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.meter__directions .active {
-  color: var(--accent);
 }
 .meter__labels {
   display: flex;
@@ -522,11 +508,12 @@ select:disabled {
   gap: 2px;
 }
 .tune-status strong {
-  font-size: 14px;
+  font-size: clamp(18px, 2vw, 26px);
+  line-height: 1;
 }
 .tune-status span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .status-callout {
   display: flex;
@@ -612,8 +599,9 @@ select:disabled {
   margin-top: 0;
 }
 .stop-button {
-  border-color: rgba(255, 83, 77, 0.45);
-  color: #ff7c76;
+  border-color: var(--line-bright);
+  color: var(--muted);
+  background: transparent;
 }
 .button.ghost {
   background: transparent;
@@ -631,9 +619,9 @@ select:disabled {
   width: 100%;
 }
 .guided-session-launch {
-  border-color: rgba(213, 255, 63, 0.42);
-  color: var(--accent);
-  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--muted);
+  background: transparent;
 }
 .guided-session-card {
   position: relative;
@@ -892,9 +880,34 @@ select:disabled {
 }
 .settings-section h3 {
   margin: 0 0 17px;
-  font-size: 12px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+}
+.settings-disclosure > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.03em;
+  list-style: none;
+}
+.settings-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+.settings-disclosure > summary::after {
+  color: var(--accent);
+  content: '+';
+  font-size: 20px;
+  font-weight: 400;
+}
+.settings-disclosure[open] > summary::after {
+  content: '−';
+}
+.settings-disclosure__body {
+  margin-top: 17px;
 }
 .interface-mode-switch {
   display: grid;
@@ -995,6 +1008,9 @@ input[type='range'] {
 }
 .section-heading h3 {
   margin: 0;
+}
+.section-heading--end {
+  justify-content: flex-end;
 }
 .empty-state {
   margin: 0;
@@ -1335,6 +1351,11 @@ input[type='range'] {
     width: 100%;
     min-height: 50px;
   }
+  .stop-button {
+    width: auto;
+    min-width: 0;
+    min-height: 44px;
+  }
   .start-actions {
     position: fixed;
     right: 14px;
@@ -1343,7 +1364,7 @@ input[type='range'] {
     z-index: 20;
     display: grid;
     width: auto;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: 1fr;
     gap: 7px;
     margin: 0;
     padding: 7px;
@@ -1357,6 +1378,17 @@ input[type='range'] {
     min-width: 0;
     min-height: 50px;
   }
+  .start-actions .guided-session-launch {
+    min-height: 44px;
+  }
+  .tuner-layout--with-panel .center-stage--idle {
+    padding-bottom: 16px;
+  }
+  .tuner-layout--with-panel .start-actions {
+    position: static;
+    width: 100%;
+    margin-top: 18px;
+  }
   .right-panel {
     order: 2;
     display: block;
@@ -1367,16 +1399,12 @@ input[type='range'] {
     margin-bottom: 12px;
   }
   .string-strip {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 7px;
-    padding-bottom: 7px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
   }
   .string-button {
-    flex: 0 0 70px;
     min-height: 72px;
-    scroll-snap-align: start;
   }
   .signal-panel {
     margin-top: 17px;

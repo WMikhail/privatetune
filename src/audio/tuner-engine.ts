@@ -44,6 +44,9 @@ const browserPlatform: TunerEnginePlatform = {
     new window.AudioWorkletNode(context, 'audio-capture-processor', {
       numberOfInputs: 1,
       numberOfOutputs: 1,
+      channelCount: 1,
+      channelCountMode: 'explicit',
+      channelInterpretation: 'speakers',
       outputChannelCount: [1]
     }),
   createWorker: () => new Worker(new URL('./pitch-worker.ts', import.meta.url), { type: 'module' }),

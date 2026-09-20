@@ -119,31 +119,41 @@ function saveTuning(value: {
             </div>
           </section>
 
-          <section v-if="store.settings.interfaceMode === 'professional'" class="settings-section">
-            <h3>Калибровка</h3>
-            <label class="field range-field"
-              ><span
-                ><b>A4</b><output>{{ store.settings.a4 }} Hz</output></span
-              ><input v-model.number="store.settings.a4" type="range" min="430" max="450" step="1"
-            /></label>
-            <label class="field"
-              ><span>Названия нот</span
-              ><select v-model="store.settings.accidental">
-                <option value="sharp">Диезы · C♯</option>
-                <option value="flat">Бемоли · D♭</option>
-              </select></label
-            >
-            <label class="field range-field"
-              ><span
-                ><b>Порог шума</b><output>{{ store.settings.noiseGateDb }} dB</output></span
-              ><input
-                v-model.number="store.settings.noiseGateDb"
-                type="range"
-                min="-70"
-                max="-30"
-                step="1"
-            /></label>
-          </section>
+          <details
+            v-if="store.settings.interfaceMode === 'professional'"
+            class="settings-section settings-disclosure"
+          >
+            <summary>Калибровка и сигнал</summary>
+            <div class="settings-disclosure__body">
+              <label class="field range-field"
+                ><span
+                  ><b>A4</b><output>{{ store.settings.a4 }} Hz</output></span
+                ><input
+                  v-model.number="store.settings.a4"
+                  type="range"
+                  min="430"
+                  max="450"
+                  step="1"
+              /></label>
+              <label class="field"
+                ><span>Названия нот</span
+                ><select v-model="store.settings.accidental">
+                  <option value="sharp">Диезы · C♯</option>
+                  <option value="flat">Бемоли · D♭</option>
+                </select></label
+              >
+              <label class="field range-field"
+                ><span
+                  ><b>Порог шума</b><output>{{ store.settings.noiseGateDb }} dB</output></span
+                ><input
+                  v-model.number="store.settings.noiseGateDb"
+                  type="range"
+                  min="-70"
+                  max="-30"
+                  step="1"
+              /></label>
+            </div>
+          </details>
 
           <section class="settings-section">
             <h3>Аудиовход</h3>
@@ -176,52 +186,57 @@ function saveTuning(value: {
             >
           </section>
 
-          <section v-if="store.settings.interfaceMode === 'professional'" class="settings-section">
-            <div class="section-heading">
-              <h3>Мои строи</h3>
-              <button class="button compact" type="button" @click="createTuning">
-                <Plus :size="16" /> Добавить
-              </button>
+          <details
+            v-if="store.settings.interfaceMode === 'professional'"
+            class="settings-section settings-disclosure"
+          >
+            <summary>Мои строи</summary>
+            <div class="settings-disclosure__body">
+              <div class="section-heading section-heading--end">
+                <button class="button compact" type="button" @click="createTuning">
+                  <Plus :size="16" /> Добавить
+                </button>
+              </div>
+              <CustomTuningEditor
+                v-if="editorOpen"
+                :model-value="editing"
+                @save="saveTuning"
+                @cancel="editorOpen = false"
+              />
+              <div v-else-if="store.customTunings.length" class="custom-list">
+                <article v-for="tuning in store.customTunings" :key="tuning.id">
+                  <div>
+                    <strong>{{ tuning.name }}</strong
+                    ><span>{{ tuning.stringCount }} струн</span>
+                  </div>
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      aria-label="Редактировать строй"
+                      @click="editTuning(tuning)"
+                    >
+                      <Pencil :size="17" /></button
+                    ><button
+                      type="button"
+                      aria-label="Дублировать строй"
+                      @click="store.duplicateCustomTuning(tuning.id)"
+                    >
+                      <Copy :size="17" /></button
+                    ><button
+                      type="button"
+                      aria-label="Удалить строй"
+                      @click="store.removeCustomTuning(tuning.id)"
+                    >
+                      <Trash2 :size="17" />
+                    </button>
+                  </div>
+                </article>
+              </div>
+              <p v-else-if="!editorOpen" class="empty-state">
+                Создайте собственный строй на 4–9 струн.
+              </p>
             </div>
-            <CustomTuningEditor
-              v-if="editorOpen"
-              :model-value="editing"
-              @save="saveTuning"
-              @cancel="editorOpen = false"
-            />
-            <div v-else-if="store.customTunings.length" class="custom-list">
-              <article v-for="tuning in store.customTunings" :key="tuning.id">
-                <div>
-                  <strong>{{ tuning.name }}</strong
-                  ><span>{{ tuning.stringCount }} струн</span>
-                </div>
-                <div class="row-actions">
-                  <button
-                    type="button"
-                    aria-label="Редактировать строй"
-                    @click="editTuning(tuning)"
-                  >
-                    <Pencil :size="17" /></button
-                  ><button
-                    type="button"
-                    aria-label="Дублировать строй"
-                    @click="store.duplicateCustomTuning(tuning.id)"
-                  >
-                    <Copy :size="17" /></button
-                  ><button
-                    type="button"
-                    aria-label="Удалить строй"
-                    @click="store.removeCustomTuning(tuning.id)"
-                  >
-                    <Trash2 :size="17" />
-                  </button>
-                </div>
-              </article>
-            </div>
-            <p v-else-if="!editorOpen" class="empty-state">
-              Создайте собственный строй на 4–9 струн.
-            </p>
-          </section>
+          </details>
 
           <button class="button danger wide" type="button" @click="store.resetSettings">
             <RotateCcw :size="17" /> Сбросить настройки

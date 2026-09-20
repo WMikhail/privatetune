@@ -28,7 +28,7 @@ function select(index: number): void {
   <section class="strings-panel" aria-labelledby="strings-title">
     <div class="panel-heading">
       <div>
-        <span class="kicker">СТРУНЫ</span>
+        <span class="kicker">Струны</span>
         <h2 id="strings-title">От толстой к тонкой</h2>
       </div>
       <span class="string-count">{{ strings.length }}×</span>

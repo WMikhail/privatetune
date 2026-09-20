@@ -70,6 +70,11 @@ export function useTunerRuntime(isActive: Readonly<Ref<boolean>>) {
     engine ??= createEngine()
     engine.updateConfig(config.value)
     await engine.start()
+    if (status.value === 'missing' && settings.value.inputDeviceId) {
+      settings.value.inputDeviceId = ''
+      engine.updateConfig(config.value)
+      await engine.start()
+    }
   }
 
   async function stop(): Promise<void> {

@@ -84,14 +84,14 @@ test('standard and professional interfaces expose the right amount of control', 
   await page.locator('.control-panel select').nth(1).selectOption('b5-drop-a')
   await page.getByRole('button', { name: /Струна 3, A1/ }).click()
   await expect(page.getByRole('radio', { name: 'Струна' })).toBeChecked()
-  await page.getByRole('button', { name: 'Остановить микрофон' }).click()
+  await page.getByRole('button', { name: 'Завершить настройку и выключить микрофон' }).click()
   await expect(page.getByRole('button', { name: 'Начать настройку' })).toBeVisible()
 })
 
 test('full guided session advances through tuning and verification', async ({ page }) => {
   await installTestEngine(page)
   await page.goto('/')
-  await page.getByRole('button', { name: 'По струнам' }).click()
+  await page.getByRole('button', { name: 'Настроить все струны' }).click()
   await expect(page.getByText('ПРОХОД 1 ИЗ 2')).toBeVisible()
   await expect(page.getByText('Настройте струну 6')).toBeVisible()
 
@@ -130,6 +130,7 @@ test('custom tuning persists after reload', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Открыть настройки' }).click()
   await page.getByRole('radio', { name: /Профессиональный/ }).check()
+  await page.locator('summary').filter({ hasText: 'Мои строи' }).click()
   await page.getByRole('button', { name: /Добавить/ }).click()
   await page.getByPlaceholder('Например, My Drop F').fill('E2E Drop')
   await page.getByRole('button', { name: 'Добавить строй' }).click()
@@ -203,10 +204,11 @@ test('Chromium obtains a real fake MediaStream and stops its track', async ({ pa
   })
   await page.goto('/')
   await page.getByRole('button', { name: 'Начать настройку' }).click()
-  await expect(page.getByRole('button', { name: 'Остановить микрофон' })).toBeVisible({
-    timeout: 15_000
+  const finish = page.getByRole('button', {
+    name: 'Завершить настройку и выключить микрофон'
   })
-  await page.getByRole('button', { name: 'Остановить микрофон' }).click()
+  await expect(finish).toBeVisible({ timeout: 15_000 })
+  await finish.click()
   await expect
     .poll(() =>
       page.evaluate(() => Boolean((window as Window & { __trackStopped?: boolean }).__trackStopped))

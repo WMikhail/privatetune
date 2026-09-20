@@ -49,7 +49,7 @@ describe('App flows', () => {
     await flushPromises()
     expect(wrapper.text()).toContain('E2')
     expect(wrapper.text()).toContain('Настроено')
-    expect(wrapper.text()).toContain('СТРУНА 6 · ОТКРЫТАЯ')
+    expect(wrapper.text()).toContain('Струна 6 · открытая')
     expect(wrapper.get('.control-panel').classes()).toContain('control-panel--collapsed')
     expect(wrapper.get('.mobile-selection__change').text()).toBe('Изменить')
     expect(wrapper.get('.gauge').attributes('aria-live')).toBeUndefined()
@@ -58,7 +58,7 @@ describe('App flows', () => {
     await wrapper.get('button.stop-button').trigger('click')
     await flushPromises()
     expect(stop).toHaveBeenCalledOnce()
-    expect(wrapper.text()).toContain('Настройте инструмент')
+    expect(wrapper.text()).toContain('Готов к настройке')
   })
 
   it('shows denied and unsupported microphone states', async () => {
@@ -81,6 +81,36 @@ describe('App flows', () => {
     await flushPromises()
     expect(wrapper.text()).toContain('API не поддерживается')
     expect(wrapper.get('button.mic-button').attributes('disabled')).toBeDefined()
+  })
+
+  it('falls back to the default input when a stored device disappears', async () => {
+    localStorage.setItem(
+      SETTINGS_KEY,
+      JSON.stringify({
+        version: 1,
+        data: { ...DEFAULT_SETTINGS, inputDeviceId: 'missing-device' }
+      })
+    )
+    let inputDeviceId = ''
+    const starts = vi.fn()
+    window.__PRIVATETUNE_TEST_ENGINE_FACTORY__ = (events) => ({
+      updateConfig: (value) => (inputDeviceId = value.inputDeviceId),
+      start: async () => {
+        starts(inputDeviceId)
+        events.onStatus('requesting')
+        await Promise.resolve()
+        events.onStatus(inputDeviceId ? 'missing' : 'running')
+      },
+      stop: vi.fn().mockResolvedValue(undefined)
+    })
+    const wrapper = mountApp()
+
+    await wrapper.get('button.mic-button').trigger('click')
+    await flushPromises()
+
+    expect(starts.mock.calls).toEqual([['missing-device'], ['']])
+    expect(useTunerStore().settings.inputDeviceId).toBe('')
+    expect(useTunerStore().status).toBe('running')
   })
 
   it('offers direct recovery actions for signal problems', async () => {
@@ -360,7 +390,7 @@ describe('App flows', () => {
       showSignalPanel: false
     })
     expect(wrapper.text()).toContain('E Standard')
-    expect(wrapper.text()).toContain('Тюнер сам определит нужную струну')
+    expect(wrapper.text()).toContain('Сыграйте любую открытую струну')
     expect(wrapper.find('.mode-switch').exists()).toBe(false)
     expect(wrapper.find('.right-panel').exists()).toBe(false)
     expect(wrapper.find('.gauge__frequency').exists()).toBe(false)

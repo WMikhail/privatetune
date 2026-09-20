@@ -62,7 +62,14 @@ export function matchPitch(rawFrequency: number, options: MatchOptions): PitchMa
     index: allowed[0]!.index,
     distance: Infinity
   }
-  for (const candidate of harmonicCandidates(rawFrequency)) {
+  // ponytail: pitch alone cannot distinguish exact harmonics from real high strings;
+  // add spectral evidence if automatic recovery must handle that ambiguous case.
+  const candidates =
+    mode === 'automatic' &&
+    allowed.some((target) => targetDistance(rawFrequency, target.midi, a4) <= 50)
+      ? [rawFrequency]
+      : harmonicCandidates(rawFrequency)
+  for (const candidate of candidates) {
     for (const target of allowed) {
       const distance = targetDistance(candidate, target.midi, a4)
       if (distance < best.distance)
@@ -71,13 +78,18 @@ export function matchPitch(rawFrequency: number, options: MatchOptions): PitchMa
   }
 
   if (mode === 'automatic' && previousMidi !== null && strings.includes(previousMidi)) {
-    const previousDistance = targetDistance(best.frequency, previousMidi, a4)
-    if (previousDistance <= best.distance + hysteresisCents) {
+    const previous = candidates
+      .map((frequency) => ({
+        frequency,
+        distance: targetDistance(frequency, previousMidi, a4)
+      }))
+      .sort((left, right) => left.distance - right.distance)[0]!
+    if (previous.distance <= best.distance + hysteresisCents) {
       best = {
-        frequency: best.frequency,
+        frequency: previous.frequency,
         midi: previousMidi,
         index: strings.indexOf(previousMidi),
-        distance: previousDistance
+        distance: previous.distance
       }
     }
   }

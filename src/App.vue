@@ -193,22 +193,24 @@ watch(isActive, (value) => {
       </div>
     </header>
 
-    <main id="main" class="tuner-layout" :class="{ 'tuner-layout--simple': !showRightPanel }">
+    <main
+      id="main"
+      class="tuner-layout"
+      :class="{
+        'tuner-layout--simple': !showRightPanel,
+        'tuner-layout--with-panel': showRightPanel
+      }"
+    >
       <aside
         class="control-panel panel"
         :class="{ 'control-panel--collapsed': isActive && !mobileControlsOpen }"
       >
         <div class="panel-heading">
           <div>
-            <span class="kicker">{{ isProfessional ? 'ТОЧНЫЙ КОНТРОЛЬ' : 'БЫСТРЫЙ СТАРТ' }}</span>
-            <h1 v-if="isProfessional">Точный строй.<br />Только ваш звук.</h1>
-            <h1 v-else>Выберите строй.<br />И начинайте.</h1>
-            <p class="panel-intro">
-              {{
-                isProfessional
-                  ? 'Ручной выбор цели и подробные показатели.'
-                  : 'Тюнер сам определит нужную струну.'
-              }}
+            <span class="kicker">{{ isProfessional ? 'Точный контроль' : 'Параметры' }}</span>
+            <h1>{{ isProfessional ? 'Точная настройка' : 'Инструмент и строй' }}</h1>
+            <p v-if="isProfessional" class="panel-intro">
+              Ручной выбор цели и подробные показатели.
             </p>
           </div>
         </div>
@@ -340,11 +342,17 @@ watch(isActive, (value) => {
             :disabled="isBusy"
             @click="beginGuidedSession"
           >
-            <ListChecks :size="18" /> По струнам
+            <ListChecks :size="18" /> Настроить все струны
           </button>
         </div>
-        <button v-else class="button stop-button" type="button" @click="stop">
-          <Square :size="18" fill="currentColor" /> Остановить микрофон
+        <button
+          v-else
+          class="button stop-button"
+          type="button"
+          aria-label="Завершить настройку и выключить микрофон"
+          @click="stop"
+        >
+          <Square :size="16" fill="currentColor" /> Завершить
         </button>
       </section>
 

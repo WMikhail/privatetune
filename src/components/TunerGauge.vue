@@ -18,12 +18,12 @@ const note = computed(() =>
 const status = computed(() => {
   if (!props.reading)
     return {
-      label: props.active ? 'Сыграйте одну струну' : 'Готов к настройке',
-      direction: props.active ? 'Ожидание сигнала' : 'Микрофон выключен',
+      label: props.active ? 'Ожидание сигнала' : 'Готов к настройке',
+      direction: props.active ? 'Сыграйте струну' : 'Микрофон выключен',
       icon: Minus
     }
   if (props.reading.state === 'in-tune')
-    return { label: 'Настроено', direction: 'Точно', icon: Check }
+    return { label: 'Точно', direction: 'Настроено', icon: Check }
   if (props.reading.cents < 0)
     return {
       label: props.reading.state === 'close' ? 'Почти настроено' : 'Ниже цели',
@@ -38,9 +38,9 @@ const status = computed(() => {
 })
 const gaugeState = computed(() => props.reading?.state ?? 'idle')
 const eyebrow = computed(() => {
-  if (props.detailed) return 'ТЕКУЩАЯ НОТА'
-  if (props.reading && props.stringNumber !== null) return `СТРУНА ${props.stringNumber} · ОТКРЫТАЯ`
-  return 'СЫГРАЙТЕ ОТКРЫТУЮ СТРУНУ'
+  if (props.detailed) return 'Текущая нота'
+  if (props.reading && props.stringNumber !== null) return `Струна ${props.stringNumber} · открытая`
+  return 'Сыграйте открытую струну'
 })
 const needleLeft = computed(() => {
   if (props.reading?.state === 'in-tune') return '50%'
@@ -55,12 +55,11 @@ const centsLabel = computed(() => {
 <template>
   <section class="gauge" :data-state="gaugeState">
     <p class="sr-only" aria-live="polite" aria-atomic="true">
-      {{ note ? `${note.name}${note.octave}, ${status.label}` : status.label }}
+      {{ note ? `${note.name}${note.octave}, ${status.direction}` : status.direction }}
     </p>
     <div v-if="!active" class="gauge__idle">
-      <span class="gauge__eyebrow">ТЮНЕР ГОТОВ</span>
-      <strong>Настройте инструмент</strong>
-      <small>Выберите строй и начните настройку.</small>
+      <strong>Готов к настройке</strong>
+      <small>Сыграйте любую открытую струну.</small>
     </div>
     <template v-else>
       <div class="gauge__eyebrow">{{ eyebrow }}</div>
@@ -78,10 +77,6 @@ const centsLabel = computed(() => {
         <div v-if="detailed" class="meter__labels">
           <span>−50</span><span>−25</span><span>0</span><span>+25</span><span>+50</span>
         </div>
-        <div v-else-if="reading" class="meter__directions" aria-hidden="true">
-          <span :class="{ active: reading.cents < -3 }">Натянуть</span
-          ><span :class="{ active: reading.cents > 3 }">Ослабить</span>
-        </div>
         <div class="meter__rail">
           <i v-for="tick in 41" :key="tick" :class="{ major: (tick - 1) % 10 === 0 }" />
           <div class="meter__sweet-spot" aria-hidden="true" />
@@ -97,8 +92,8 @@ const centsLabel = computed(() => {
         <div class="tune-status">
           <component :is="status.icon" :size="21" stroke-width="2.2" aria-hidden="true" />
           <div>
-            <strong>{{ status.label }}</strong
-            ><span>{{ status.direction }}</span>
+            <strong>{{ status.direction }}</strong
+            ><span>{{ status.label }}</span>
           </div>
         </div>
       </div>
