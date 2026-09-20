@@ -580,6 +580,11 @@ select:disabled {
   color: #0b0d0e;
   background: var(--accent);
 }
+.button.primary:not(:disabled):hover,
+.mic-button:not(:disabled):hover {
+  background: var(--accent);
+  box-shadow: 0 0 18px var(--accent-soft);
+}
 .mic-button,
 .stop-button {
   min-width: 220px;
